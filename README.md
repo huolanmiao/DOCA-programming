@@ -2,7 +2,16 @@
 
 1. 下载atrust，按账号密码登录
 2. 连接host：`ssh -p 22 doca@192.168.102.1` 密码：`@doca`
-3. 在host的命令行连接dpu：`ssh -p 22 ubuntu@192.168.100.2` 密码：`@doca`
+3. 在host中打开一个terminal连接dpu：`ssh -p 22 ubuntu@192.168.100.2` 密码：`@doca`
+
+<figure style="display: inline-block; margin-right: 10px; text-align: center;">
+    <img src="./figures/terminal_dpu.bmp" width="300" />
+    <figcaption>A terminal on Host connected to dpu</figcaption>
+</figure>
+<figure style="display: inline-block; text-align: center;">
+    <img src="./figures/terminal_host.bmp" width="300" />
+    <figcaption>A terminal on Host</figcaption>
+</figure>
 
 # 编译secure channel(已完成)
 
