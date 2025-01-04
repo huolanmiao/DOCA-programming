@@ -5,11 +5,11 @@
 3. 在host中打开一个terminal连接dpu：`ssh -p 22 ubuntu@192.168.100.2` 密码：`@doca`
 
 <figure style="display: inline-block; margin-right: 10px; text-align: center;">
-    <img src="./figures/terminal_dpu.bmp" width="300" />
+    <img src="./figures/terminal_dpu.bmp" width="500" />
     <figcaption>A terminal on Host connected to dpu</figcaption>
 </figure>
 <figure style="display: inline-block; text-align: center;">
-    <img src="./figures/terminal_host.bmp" width="300" />
+    <img src="./figures/terminal_host.bmp" width="500" />
     <figcaption>A terminal on Host</figcaption>
 </figure>
 
