@@ -57,3 +57,13 @@
     # secure_channel_core.c
     ```
 - 改完源代码之后要重新编译
+
+<figure style="text-align: center;">
+  <img src="./figures/dpu.bmp" alt="DPU received message" />
+  <figcaption>DPU received messages</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+  <img src="./figures/host.bmp" alt="host sent message" />
+  <figcaption>Host sent messages</figcaption>
+</figure>
