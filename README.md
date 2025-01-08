@@ -1,4 +1,5 @@
-# 连接机器
+# 基础实现
+## 连接机器
 
 1. 下载atrust，按账号密码登录
 2. 连接host：`ssh -p 22 doca@192.168.102.1` 密码：`@doca`
@@ -13,7 +14,7 @@
     <figcaption>A terminal on Host</figcaption>
 </figure>
 
-# 编译secure channel(已完成)
+## 编译secure channel(已完成)
 
 1. 切换到根目录
     ```shell
@@ -28,7 +29,7 @@
     ```
 3. 在host和dpu都要完成编译
 
-# 运行
+## 运行
 
 1. 找到编译好的secure channel的位置
     ```shell
@@ -57,7 +58,7 @@
     ./doca_secure_channel -s 256 -n 10 -p 03:00.0 
     # Connection to DPU was established successfully
 
-# 更改源代码以打印消息（已完成）
+## 更改源代码以打印消息
 
 - 源代码位于：
     ```shell
@@ -280,3 +281,59 @@
     <img src="./figures/dpu_json_received.png" alt="host sent message" />
     <figcaption>dpu received messages</figcaption>
     </figure>
+
+## 功能二
+支持host发送两个数字到dpu，并由dpu进行加法计算，并输出结果到命令行
+### 1. 实现
+1. 更改数据结构。在sc_config中新加入两个int类型的成员变量`a`和`b`，
+2. 通过`register_secure_channel_params`函数注册新的命令行参数：被加数`--augend`和加数`--addend`，分别对应sc_config中的a和b。
+3. 修改`sendto_channel`函数，将a和b写入send_buffer，并通过secure channel传递给DPU;
+4. 修改`recvfrom_channel`函数，接收send_buffer，并通过`my_add`函数解析为a和b，然后再相加，并把结果打印。
+
+### 2. 演示
+1. `$ ./doca_secure_channel -h` 显示目前可以接收的命令行参数，可以看到新增了a和b。
+
+    <figure style="text-align: center;">
+    <img src="./figures/help.png" alt="host sent message" />
+    <figcaption>show exist flags</figcaption>
+    </figure>
+
+2. 在Bluefield运行指令`$ ./doca_secure_channel -s 256 -n 10 -p 03:00.0 -r b1:00.0`，启动server
+   ![](./figures/dpu_server.png)
+3. 在host命令行运行指令`$ ./doca_secure_channel -s 256 -n 10 -p 03:00.0 -r b1:00.0 -a 1 -b 10`，host传入两个数a=1和b=10给dpu
+<figure style="text-align: center;">
+<img src="./figures/host_a=1,b=10.png" alt="host sent message" />
+<figcaption>host send a=1, b=10</figcaption>
+</figure>
+4. 此时Bluefield上会显示传送过来的数据，并求和
+   <figure style="text-align: center;">
+    <img src="./figures/dpu_a=1,b=10.png" alt="host sent message" />
+    <figcaption>dpu received a=1, b=10, and get a+b=11</figcaption>
+    </figure>
+
+
+我们还可以多尝试几个不同的输入
+<figure style="text-align: center;">
+<img src="./figures/host_a=1,b=20.png" alt="host sent message" />
+<figcaption>host send a=1, b=20</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="./figures/dpu_a=1,b=20.png" alt="host sent message" />
+<figcaption>dpu received a=1, b=20, and get a+b=11</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="./figures/host_a=20,b=20.png" alt="host sent message" />
+<figcaption>host send a=20, b=20</figcaption>
+</figure>
+
+
+<figure style="text-align: center;">
+<img src="./figures/dpu_a=20,b=20.png" alt="host sent message" />
+<figcaption>dpu received a=20, b=20, and get a+b=11</figcaption>
+</figure>
+
+
+可以看到无论a和b取任何值，都可以通过secure_channel传送到dpu，并完成计算。
+
