@@ -1,4 +1,4 @@
-# 基础实现
+# 基础功能实现
 ## 连接机器
 
 1. 下载atrust，按账号密码登录
@@ -14,7 +14,7 @@
     <figcaption>A terminal on Host</figcaption>
 </figure>
 
-## 编译secure channel(已完成)
+## 编译secure channel
 
 1. 切换到根目录
     ```shell
@@ -79,10 +79,10 @@
 </figure>
 
 
-## 功能一：使用json文件来导入configuration
+# 功能一：使用json文件来导入configuration
 使用json文件替换命令行来输入指令
 
-### 1. 功能实现分析
+## 实现思路
 使用json来输入文件的功能在提供的代码中已经实现，具体来说，命令行解析代码在`secure_channel/secure_channel.c`的57-74行。
 1. 首先，调用`<doca_argp.h>`库的`doca_argp_init`函数。通过注册程序名称（在这里是"doca_secure_channel"）和程序参数初始化argp模块
     
@@ -204,6 +204,7 @@
         return EXIT_FAILURE;
     }
     ```
+    
 3. 最后，调用`<doca_argp.h>`库的`doca_argp_start`函数解析命令行参数，如果参数中有`--json`，doca_argp_start可以自动识别
    
    ```c
@@ -216,7 +217,7 @@
    ```
    
 
-### 2. 演示
+## 功能演示
 1. 在BlueField上写json文件:
     ```shell
     $ cd /tmp/build/secure_channel # 找到编译好的代码位置
@@ -242,10 +243,10 @@
     $ ./doca_secure_channel --json sc_params.json
     ```
     效果如下：
-    <figure style="text-align: center;">
-    <img src="./figures/dpu_json.png" alt="host sent message" />
-    <figcaption>DPU server start by json file</figcaption>
-    </figure>
+<figure style="text-align: center;">
+<img src="./figures/dpu_json.png" alt="host sent message" />
+<figcaption>DPU server start by json file</figcaption>
+</figure>
 
 
 3. 在host上写json文件:
@@ -272,47 +273,48 @@
     $ ./doca_secure_channel --json sc_params.json
     ```
     效果如下：
-    <figure style="text-align: center;">
-    <img src="./figures/host_json.png" alt="host sent message" />
-    <figcaption>host send messages through json configuration</figcaption>
-    </figure>
+<figure style="text-align: center;">
+<img src="./figures/host_json.png" alt="host sent message" />
+<figcaption>host send messages through json configuration</figcaption>
+</figure>
 
-    <figure style="text-align: center;">
-    <img src="./figures/dpu_json_received.png" alt="host sent message" />
-    <figcaption>dpu received messages</figcaption>
-    </figure>
+<figure style="text-align: center;">
+<img src="./figures/dpu_json_received.png" alt="host sent message" />
+<figcaption>dpu received messages</figcaption>
+</figure>
 
-## 功能二
-支持host发送两个数字到dpu，并由dpu进行加法计算，并输出结果到命令行
-### 1. 实现
-1. 更改数据结构。在sc_config中新加入两个int类型的成员变量`a`和`b`，
+# 功能二：支持host发送两个数字到dpu，并由dpu进行加法计算，输出结果到命令行
+
+## 实现思路
+1. 更改数据结构。在sc_config中新加入两个int类型的成员变量`a`和`b`。
 2. 通过`register_secure_channel_params`函数注册新的命令行参数：被加数`--augend`和加数`--addend`，分别对应sc_config中的a和b。
-3. 修改`sendto_channel`函数，将a和b写入send_buffer，并通过secure channel传递给DPU;
+3. 修改`sendto_channel`函数，将a和b写入send_buffer，并通过secure channel传递给DPU。
 4. 修改`recvfrom_channel`函数，接收send_buffer，并通过`my_add`函数解析为a和b，然后再相加，并把结果打印。
 
-### 2. 演示
+## 功能演示
 1. `$ ./doca_secure_channel -h` 显示目前可以接收的命令行参数，可以看到新增了a和b。
 
-    <figure style="text-align: center;">
-    <img src="./figures/help.png" alt="host sent message" />
-    <figcaption>show exist flags</figcaption>
-    </figure>
+<figure style="text-align: center;">
+<img src="./figures/help.png" alt="host sent message" />
+<figcaption>show exist flags</figcaption>
+</figure>
 
 2. 在Bluefield运行指令`$ ./doca_secure_channel -s 256 -n 10 -p 03:00.0 -r b1:00.0`，启动server
    ![](./figures/dpu_server.png)
-3. 在host命令行运行指令`$ ./doca_secure_channel -s 256 -n 10 -p 03:00.0 -r b1:00.0 -a 1 -b 10`，host传入两个数a=1和b=10给dpu
+3. 在host命令行运行指令`$ ./doca_secure_channel -s 256 -n 10 -p 03:00.0 -r b1:00.0 -a 1 -b 10`，host传入两个数a=1和b=10给dpu。此时Bluefield上会显示传送过来的数据，并求和
 <figure style="text-align: center;">
 <img src="./figures/host_a=1,b=10.png" alt="host sent message" />
 <figcaption>host send a=1, b=10</figcaption>
 </figure>
-4. 此时Bluefield上会显示传送过来的数据，并求和
-   <figure style="text-align: center;">
-    <img src="./figures/dpu_a=1,b=10.png" alt="host sent message" />
-    <figcaption>dpu received a=1, b=10, and get a+b=11</figcaption>
-    </figure>
 
 
-我们还可以多尝试几个不同的输入
+<figure style="text-align: center;">
+<img src="./figures/dpu_a=1,b=10.png" alt="host sent message" />
+<figcaption>dpu received a=1, b=10, and get a+b=11</figcaption>
+</figure>
+
+
+4. 我们还可以多尝试几个不同的输入。可以看到无论a和b取任何值，都可以通过secure_channel传送到dpu，并完成计算。
 <figure style="text-align: center;">
 <img src="./figures/host_a=1,b=20.png" alt="host sent message" />
 <figcaption>host send a=1, b=20</figcaption>
@@ -335,5 +337,5 @@
 </figure>
 
 
-可以看到无论a和b取任何值，都可以通过secure_channel传送到dpu，并完成计算。
+
 
